@@ -57,10 +57,10 @@ class CSVManager:
 
 if __name__ == "__main__":
     # Definição de datas no formato necessário
-    dia_ini1 = "02%2F10%2F2023" #"11%2F07%2F2024"
-    dia_ini2 = "2023-10-02"  #"2024-07-11"
-    dia_fin1 = "02%2F10%2F2023" #"11%2F07%2F2024"
-    dia_fin2 = "2023-10-02" #"2024-07-11"
+    dia_ini1 = "03%2F10%2F2023" #"11%2F07%2F2024"
+    dia_ini2 = "2023-10-03"  #"2024-07-11"
+    dia_fin1 = "06%2F10%2F2023" #"11%2F07%2F2024"
+    dia_fin2 = "2023-10-06" #"2024-07-11"
 
     # URL formatada com as datas
     url = (f"https://defesacivil.riodosul.sc.gov.br/index.php?r=externo%2Fmetragem-sensores"

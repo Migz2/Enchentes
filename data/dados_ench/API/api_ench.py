@@ -50,8 +50,6 @@ hourly_data["cloud_cover"] = hourly_cloud_cover
 hourly_data["wind_speed_10m"] = hourly_wind_speed_10m
 
 hourly_dataframe = pd.DataFrame(data = hourly_data)
-print(hourly_dataframe)
-
 
 hourly_dataframe.to_csv("api_ench.csv", index=False, encoding="utf-8")
 
