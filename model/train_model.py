@@ -10,6 +10,7 @@ def train_model(data_path):
     logger.info(f"Carregando dados de {data_path}")
     try:
         df = pd.read_csv(data_path)
+        df = df.loc[df["Nível"].notna()]
         logger.success(f"Dados carregados com sucesso. Shape: {df.shape}")
     except Exception as e:
         logger.error(f"Erro ao carregar dados: {str(e)}")

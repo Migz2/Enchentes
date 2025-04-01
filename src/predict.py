@@ -2,9 +2,9 @@ import pandas as pd
 import pickle
 from pathlib import Path
 from loguru import logger
-
-# Configure logger
-logger.add("../logs/predictions.log", rotation="500 MB", level="INFO")
+import sys
+sys.path.append(str(Path(__file__).parents[1]))
+from model.feature_engineering import load_csv, calcular_lag, calcular_media_movel
 
 MODEL_PATH = Path(__file__).parents[1] / "model" / "model.pkl"
 DATA_PATH = Path(__file__).parents[1] / "data" / "api_recent" / "dados_api.csv"
@@ -24,9 +24,19 @@ def carregar_modelo(model_path):
 def carregar_dados(data_path):
     logger.info(f"Carregando dados de {data_path}")
     try:
-        dados = pd.read_csv(data_path, index_col="date")
-
+        dados = load_csv(data_path)
+        cols_numericas = ["temperature_2m","relative_humidity_2m","rain","cloud_cover","wind_speed_10m"]
+        dados = dados[cols_numericas]
+        logger.info(f"Dados carregados com sucesso. Shape: {dados.shape}")
+        logger.info(f"Dados: {dados.head()}")
+        janelas = [4, 8, 12, 24]
+        for col in cols_numericas:
+            for janela in janelas:
+                dados[f"{col}_media_movel_{janela}h"] = calcular_media_movel(dados, col, janela)
+                dados[f"{col}_lag_{janela}"] = calcular_lag(dados, col, janela)
         logger.success(f"Dados carregados com sucesso. Shape: {dados.shape}")
+        logger.info(f"Dados: {dados.head()}")
+        logger.info(f"Colunas disponíveis: {dados.columns.tolist()}")
         return dados
     except Exception as e:
         logger.error(f"Erro ao carregar dados: {str(e)}")

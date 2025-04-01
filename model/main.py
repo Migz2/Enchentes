@@ -5,10 +5,8 @@ from hyperparameter_tuning import tune_hyperparameters
 from evaluate import evaluate_model
 from save_model import save_model
 
-# Configure logger
-logger.add("../logs/model_training.log", rotation="500 MB", level="INFO")
 
-DATA_PATH = Path(__file__).parents[1] / "data" / "dados_ench" / "enchentes" / "enchentes.csv"
+DATA_PATH = Path(__file__).parents[1] / "data" / "dados_ench" / "API" / "api_ench_com_features.csv"
 
 logger.info("Iniciando processo de treinamento do modelo")
 
