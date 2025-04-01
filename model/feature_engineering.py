@@ -1,4 +1,7 @@
+from pathlib import Path
 import pandas as pd
+
+DADOS_ENCH = Path(__file__).parents[1] / "data" / "dados_ench"
 
 def load_csv(file_path):
     """Carrega o CSV e retorna um DataFrame ordenado pela data."""
@@ -11,9 +14,9 @@ def copy_column(df, original_column, new_column):
     df[new_column] = df[original_column]
     return df
 # Fluxo principal
-file_path = "../data/dados_ench/enchentes/enchentes.csv"  # Substitua pelo nome real do arquivo
+file_path = DADOS_ENCH / "enchentes" / "enchentes.csv"  # Substitua pelo nome real do arquivo
 
 df = load_csv(file_path) 
 
-df.to_csv("../data/dados_ench/enchentes/enchentes.csv")
+df.to_csv(DADOS_ENCH / "enchentes" / "enchentes.csv")
 print(df.head())  # Mostra as primeiras linhas
