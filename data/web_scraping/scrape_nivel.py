@@ -63,6 +63,7 @@ class WebScraper:
             except Exception as e:
                 logger.error(f"Erro ao processar período {dia_ini2} até {dia_fin2}: {str(e)}")
                 raise
+            pbar.update(1)
 
         logger.info("Análise de dados concluída com sucesso")
         if not tables:
