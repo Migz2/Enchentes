@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from loguru import logger
 from pathlib import Path
+from tqdm.auto import tqdm
 
 class WebScraper:
     """Classe responsável por realizar o Web Scraping."""
@@ -12,10 +13,8 @@ class WebScraper:
 
     def fetch_html(self, dia_ini1, dia_ini2, dia_fin1, dia_fin2):
         """Faz a requisição e retorna o HTML da página."""
-        logger.debug(f"Buscando dados para o período: {dia_ini2} até {dia_fin2}")
         response = requests.get(self.url.format(dia_ini1=dia_ini1, dia_ini2=dia_ini2, dia_fin1=dia_fin1, dia_fin2=dia_fin2))
         if response.status_code == 200:
-            logger.debug("Conteúdo HTML obtido com sucesso")
             return response.text
         else:
             logger.error(f"Falha ao buscar dados. Código de status: {response.status_code}")
@@ -32,7 +31,8 @@ class WebScraper:
 
         # Calculate the number of complete intervals
         num_intervals = (len(date_range) + timeframe - 1) // timeframe
-        
+        pbar = tqdm(total=num_intervals, desc="Processando intervalos")
+
         for i in range(num_intervals):
             start_idx = len(date_range) - (i + 1) * timeframe
             end_idx = len(date_range) - i * timeframe
@@ -43,6 +43,7 @@ class WebScraper:
                 continue
                 
             dia_ini2, dia_fin2 = date_range_slice[0], date_range_slice[-1]
+            pbar.set_postfix(dia_ini2=dia_ini2, dia_fin2=dia_fin2)
             dia_ini1, dia_fin1 = dia_ini2.strftime('%d/%m/%Y').replace('/', '%2F'), dia_fin2.strftime('%d/%m/%Y').replace('/', '%2F')
             try:
                 html = self.fetch_html(dia_ini1, dia_ini2, dia_fin1, dia_fin2)
@@ -59,7 +60,6 @@ class WebScraper:
                     logger.error("Tabela não encontrada no conteúdo HTML")
                     raise Exception("Tabela não encontrada no HTML!")
                 tables.append(pd.DataFrame(data))
-                logger.debug(f"Dados processados com sucesso para o período: {dia_ini2} até {dia_fin2}")
             except Exception as e:
                 logger.error(f"Erro ao processar período {dia_ini2} até {dia_fin2}: {str(e)}")
                 raise
