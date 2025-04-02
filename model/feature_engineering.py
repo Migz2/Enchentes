@@ -24,6 +24,10 @@ def calcular_lag(df, coluna, lag):
     """Calcula o lag de uma coluna."""
     return df[coluna].shift(lag)
 
+def calcular_target(df, coluna, lag):
+    """Calcula o target de uma coluna."""
+    return df[coluna].shift(-lag)
+
 if __name__ == "__main__":
     # Fluxo principal
     file_path = DADOS_ENCH / "API" / "api_ench.csv"  # Substitua pelo nome real do arquivo
@@ -38,5 +42,7 @@ if __name__ == "__main__":
             df[f"{coluna}_media_movel_{janela}h"] = calcular_media_movel(df, coluna, janela)
             df[f"{coluna}_lag_{janela}"] = calcular_lag(df, coluna, janela)
 
-    df.to_csv(DADOS_ENCH / "API" / "api_ench_com_features.csv", index=False)
+    df["target"] = calcular_target(df, "Nível", 3)
+
+    df.to_csv(DADOS_ENCH / "API" / "api_ench_com_features.csv")
     logger.success("Dados com features salvo com sucesso")
