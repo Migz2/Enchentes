@@ -63,6 +63,7 @@ class WebScraper:
             except Exception as e:
                 logger.error(f"Erro ao processar período {dia_ini2} até {dia_fin2}: {str(e)}")
                 raise
+            pbar.update(1)
 
         logger.info("Análise de dados concluída com sucesso")
         if not tables:
@@ -82,8 +83,8 @@ class WebScraper:
 if __name__ == "__main__":
     # Configure loguru
     scraper = WebScraper()
-    start_date = "2023-09-29"
-    end_date = "2023-12-15"
+    start_date = "2024-01-01"
+    end_date = "2025-03-31"
     df = scraper.parse_data(start_date, end_date)
     logger.info(f"Formato final do DataFrame: {df.shape}")
     logger.info(df.head())
