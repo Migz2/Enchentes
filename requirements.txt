@@ -87,6 +87,7 @@ retry-requests==2.0.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.24.0
+scipy==1.15.2
 Send2Trash==1.8.3
 setuptools==78.1.0
 six==1.17.0
@@ -109,3 +110,4 @@ webcolors==24.11.1
 webencodings==0.5.1
 websocket-client==1.8.0
 widgetsnbextension==4.0.13
+xgboost==3.0.0

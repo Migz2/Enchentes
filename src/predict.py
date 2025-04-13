@@ -45,9 +45,12 @@ def carregar_dados(data_path):
 def fazer_previsao(modelo, dados):
     logger.info("Realizando previsões...")
     try:
-        previsoes = modelo.predict(dados)
-        logger.success(f"Previsões realizadas com sucesso. Total de previsões: {len(previsoes)}")
-        return previsoes
+        # dataframe -> date, previsao
+        previsoes_df = pd.DataFrame()
+        previsoes_df['date'] = dados.index
+        previsoes_df['previsao'] = modelo.predict(dados)
+        logger.success(f"Previsões realizadas com sucesso. Total de previsões: {len(previsoes_df)}")
+        return previsoes_df
     except Exception as e:
         logger.error(f"Erro ao fazer previsões: {str(e)}")
         raise
@@ -55,8 +58,7 @@ def fazer_previsao(modelo, dados):
 def salvar_previsoes(previsoes, output_path):
     logger.info(f"Salvando previsões em {output_path}")
     try:
-        df = pd.DataFrame(previsoes, columns=['Previsao'])
-        df.to_csv(output_path, index=False)
+        previsoes.to_csv(output_path, index=False)
         logger.success("Previsões salvas com sucesso")
     except Exception as e:
         logger.error(f"Erro ao salvar previsões: {str(e)}")
