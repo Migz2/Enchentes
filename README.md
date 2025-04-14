@@ -26,7 +26,7 @@ O projeto visa desenvolver um modelo de Machine Learning capaz de prever o níve
 
 1. Clone o repositório:
 ```bash
-git clone [URL_DO_REPOSITORIO]
+git clone https://github.com/Migz2/Enchentes.git
 cd Enchentes
 ```
 
