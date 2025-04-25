@@ -294,8 +294,8 @@ if __name__ == "__main__":
     
     # Get data for the last week as DataFrame
     df = weather_api.get_all_metrics_as_df(
-        start_date="2023-01-01",
-        end_date="2023-01-07"
+        start_date="2018-01-01",
+        end_date="2024-12-31"
     )
     
     # Print DataFrame info
