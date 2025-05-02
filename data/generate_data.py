@@ -2,6 +2,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Literal, Optional
 from loguru import logger
+from tqdm.auto import tqdm
 
 from .api import WeatherAPI
 from .scraping import WebScraper
@@ -117,30 +118,57 @@ class DataGenerator:
         Returns:
             Processed DataFrame
         """
-        # Handle missing values
-        df = df.interpolate(method='linear')
+        # Create a copy to avoid fragmentation
+        df = df.copy()
         
-        # Add engineered features
+        # Convert object types and handle missing values
+        numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
+        df[numeric_columns] = df[numeric_columns].interpolate(method='linear')
+
+        # Add basic time features
         df['hour'] = df['time'].dt.hour
         df['day_of_week'] = df['time'].dt.dayofweek
         df['month'] = df['time'].dt.month
+
+        # Prepare features for rolling calculations
+        features = [col for col in df.columns if col not in ['time', 'water_level']]
         
-        # Calculate rolling averages for weather metrics
-        df['rain_24h'] = df['rain'].rolling(window=24).sum()
-        df['temperature_24h_avg'] = df['temperature_2m'].rolling(window=24).mean()
-        df['humidity_24h_avg'] = df['relative_humidity_2m'].rolling(window=24).mean()
-        
-        # Drop rows with NaN values (from rolling windows)
-        df = df.dropna()
+        rolling_features = {}
+        pbar = tqdm(features, desc="Generating feature engineering features")
+        for feature in pbar:
+            if feature in numeric_columns:
+                # Calculate rolling features efficiently
+                rolling_window = df[feature].rolling(window=24)
+                rolling_features.update({
+                    f'{feature}_24h_avg': rolling_window.mean(),
+                    f'{feature}_24h_sum': rolling_window.sum(),
+                    f'{feature}_24h_max': rolling_window.max(),
+                    f'{feature}_24h_min': rolling_window.min()
+                })
+
+                # Calculate lag features
+                for lag in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
+                    rolling_features.update({
+                        f'{feature}_lag_{lag}h': df[feature].shift(-lag)
+                    })
+
+        # Add rolling features efficiently
+        df = pd.concat([df, pd.DataFrame(rolling_features)], axis=1)
         
         # For training data, include the water level and future water levels
         if type == "train" and "water_level" in df.columns:
-            # Create target variables (water level in future hours)
+            # Create target variables (water level in future hours) more efficiently
+            future_levels = {}
             for hours in [1, 3, 6, 12, 24]:
-                df[f'water_level_next_{hours}h'] = df['water_level'].shift(-hours)
+                future_levels[f'water_level_next_{hours}h'] = df['water_level'].shift(-hours)
             
-            # Drop rows where future values are NaN
-            df = df.dropna()
+            df = pd.concat([df, pd.DataFrame(future_levels)], axis=1)
+            
+            # Drop rows where future values are NaN (only the last 24 hours will be dropped)
+            df = df.dropna(subset=[f'water_level_next_{h}h' for h in [1, 3, 6, 12, 24]])
+        
+        # Fill any remaining NaN values with forward fill then backward fill
+        df = df.fillna(method='ffill').fillna(method='bfill')
         
         logger.info(f"Data processing completed: {df.shape} rows")
         return df
