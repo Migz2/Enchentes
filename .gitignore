@@ -175,6 +175,3 @@ cython_debug/
 
 # Model
 *.pkl
-
-# Data
-*.csv
